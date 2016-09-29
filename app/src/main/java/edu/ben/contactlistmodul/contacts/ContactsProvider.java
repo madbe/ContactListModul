@@ -18,6 +18,8 @@ import java.util.ArrayList;
 
 import edu.ben.contactlistmodul.models.Contact;
 
+import static android.os.SystemClock.elapsedRealtime;
+
 public class ContactsProvider {
 
     private final Context context;
@@ -49,6 +51,8 @@ public class ContactsProvider {
      * @return
      */
     private ArrayList<Contact> readContacts() {
+        long timeStamp = elapsedRealtime();
+        Log.d("Line 56 Method entry", String.valueOf(timeStamp));
         ArrayList<Contact> contacts = new ArrayList<>();
         //Set the Uri to the Contacts list Uri
         Uri contentUri = ContactsContract.Contacts.CONTENT_URI;
@@ -57,26 +61,42 @@ public class ContactsProvider {
         //checking if the cursor isn't null and move the cursor to the
         //beginning of the table
 
-        if (cursor != null && cursor.moveToFirst()) {
 
-            Log.e("count", "" + cursor.getCount());
+        if (cursor != null && cursor.moveToFirst()) {
+            Log.d("Line 64 entry whileLoop", String.valueOf((elapsedRealtime() - timeStamp)));
+            timeStamp = elapsedRealtime();
+            Log.e("Contact count", "" + cursor.getCount());
+
             do {
+
                 //get to contact id and name
                 String contactId = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+
                 String contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
                 //with the id calling the getPhones and getEmails methods to get the
                 //contact phones and emails
+
                 Bitmap photo = getPhoto(contactId);
+
                 Bitmap thumb = getThumb(contactId);
+
+                Log.d("Line 83 middelOfwhile", String.valueOf((elapsedRealtime() - timeStamp)));
+                timeStamp = elapsedRealtime();
+
                 String photoUri = getPhotoUri(contactId);
+
                 ArrayList<String> phones = getPhones(contactId);
+
                 ArrayList<String> emails = getEmails(contactId);
+
 
                 Contact contact = new Contact(photoUri, thumb, photo, contactId, contactName, emails, phones);
                 contacts.add(contact);
+                Log.d("Line 95 endOfWhile", String.valueOf((elapsedRealtime() - timeStamp)));
+                timeStamp = elapsedRealtime();
                 //Log.d("ContactUri",contact.toString());
             } while (cursor.moveToNext());
-
+            Log.d("Line 96 endOfMethod", String.valueOf((elapsedRealtime() - timeStamp)));
             cursor.close();
         }
 
