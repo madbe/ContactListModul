@@ -25,11 +25,17 @@ public class ContactService extends AsyncTask<Void, Integer, ArrayList<Contact>>
 
     @Override
     protected ArrayList<Contact> doInBackground(Void... params) {
-
+        ArrayList<Contact> contacts = null;
         ContactsProvider provider = new ContactsProvider(context);
-        /*StringBuffer sb = provider.readContacts(context);
-        Log.d("Contact",sb.toString());*/
-        return provider.getContacts();
+        ContactProviderProj providerProj = new ContactProviderProj(context);
+        providerProj.getAllContactsFast();
+        //ArrayList<Contact> allContacts = providerProj.getContacts();
+
+        provider.contactsRead();
+        contacts = provider.readContacts(context);
+        /*Log.d("Contact",sb.toString());*/
+        //contacts = provider.getContacts();
+        return contacts;
     }
 
     @Override

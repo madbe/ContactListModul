@@ -1,6 +1,5 @@
 package edu.ben.contactlistmodul.models;
 
-import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -8,8 +7,8 @@ import java.util.ArrayList;
 
 public class Contact implements Parcelable {
 
-    private Bitmap thumb;
-    private Bitmap photo;
+    /*private Bitmap thumb;
+    private Bitmap photo;*/
     private String photoUri;
     private String id;
     private String name;
@@ -17,9 +16,9 @@ public class Contact implements Parcelable {
     private ArrayList<String> phones;
 
     //Constructor:
-    public Contact(String photoUri, Bitmap thumb, Bitmap photo, String id, String name, ArrayList<String> emails, ArrayList<String> phones) {
-        this.thumb = thumb;
-        this.photo = photo;
+    public Contact(String photoUri, /*Bitmap thumb, Bitmap photo,*/ String id, String name, ArrayList<String> emails, ArrayList<String> phones) {
+        /*this.thumb = thumb;
+        this.photo = photo;*/
         this.photoUri = photoUri;
         this.id = id;
         this.name = name;
@@ -29,7 +28,7 @@ public class Contact implements Parcelable {
 
     //Getters and Setters:
 
-    public Bitmap getThumb() {
+   /* public Bitmap getThumb() {
         return thumb;
     }
 
@@ -43,7 +42,7 @@ public class Contact implements Parcelable {
 
     public void setPhoto(Bitmap photo) {
         this.photo = photo;
-    }
+    }*/
 
     public String getPhotoUri() {
         return photoUri;
@@ -93,8 +92,8 @@ public class Contact implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeParcelable(this.thumb, flags);
-        dest.writeParcelable(this.photo, flags);
+        /*dest.writeParcelable(this.thumb, flags);
+        dest.writeParcelable(this.photo, flags);*/
         dest.writeString(this.photoUri);
         dest.writeString(this.id);
         dest.writeString(this.name);
@@ -103,8 +102,8 @@ public class Contact implements Parcelable {
     }
 
     protected Contact(Parcel in) {
-        this.thumb = in.readParcelable(Bitmap.class.getClassLoader());
-        this.photo = in.readParcelable(Bitmap.class.getClassLoader());
+        /*this.thumb = in.readParcelable(Bitmap.class.getClassLoader());
+        this.photo = in.readParcelable(Bitmap.class.getClassLoader());*/
         this.photoUri = in.readString();
         this.id = in.readString();
         this.name = in.readString();
@@ -127,8 +126,8 @@ public class Contact implements Parcelable {
     @Override
     public String toString() {
         return "Contact{" +
-                "thumb=" + thumb +
-                ", photo=" + photo +
+                /*"thumb=" + thumb +
+                ", photo=" + photo +*/
                 ", photoUri=" + photoUri +
                 ", id='" + id + '\'' +
                 ", name='" + name + '\'' +

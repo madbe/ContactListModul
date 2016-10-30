@@ -15,10 +15,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import edu.ben.contactlistmodul.models.Contact;
-
-import static android.os.SystemClock.elapsedRealtime;
 
 public class ContactsProvider {
 
@@ -51,8 +50,8 @@ public class ContactsProvider {
      * @return
      */
     private ArrayList<Contact> readContacts() {
-        long timeStamp = elapsedRealtime();
-        Log.d("Line 56 Method entry", String.valueOf(timeStamp));
+        /*long timeStamp = elapsedRealtime();
+        Log.d("Line 56 Method entry", String.valueOf(timeStamp));*/
         ArrayList<Contact> contacts = new ArrayList<>();
         //Set the Uri to the Contacts list Uri
         Uri contentUri = ContactsContract.Contacts.CONTENT_URI;
@@ -63,40 +62,59 @@ public class ContactsProvider {
 
 
         if (cursor != null && cursor.moveToFirst()) {
-            Log.d("Line 64 entry whileLoop", String.valueOf((elapsedRealtime() - timeStamp)));
+            /*Log.d("Line 64 entry whileLoop", String.valueOf((elapsedRealtime() - timeStamp)));
             timeStamp = elapsedRealtime();
-            Log.e("Contact count", "" + cursor.getCount());
+            Log.e("Contact count", "" + cursor.getCount());*/
+
+
+            long timeStamp2 =0;
 
             do {
 
+                //timeStamp2 += elapsedRealtime() - timeStamp;
+                /*Log.d("Line 0 ", String.valueOf((elapsedRealtime() - timeStamp)));
+                timeStamp = elapsedRealtime();
+*/
                 //get to contact id and name
                 String contactId = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+
+                /*Log.d("Line 1 ", String.valueOf((elapsedRealtime() - timeStamp)));
+                timeStamp = elapsedRealtime();*/
 
                 String contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
                 //with the id calling the getPhones and getEmails methods to get the
                 //contact phones and emails
 
-                Bitmap photo = getPhoto(contactId);
 
-                Bitmap thumb = getThumb(contactId);
+                /*Bitmap photo = getPhoto(contactId);
 
-                Log.d("Line 83 middelOfwhile", String.valueOf((elapsedRealtime() - timeStamp)));
-                timeStamp = elapsedRealtime();
+                Bitmap thumb = getThumb(contactId);*/
+
+//                Log.d("Line 2 ", String.valueOf((elapsedRealtime() - timeStamp)));
+//                timeStamp = elapsedRealtime();
 
                 String photoUri = getPhotoUri(contactId);
 
+//                Log.d("Line 3 ", String.valueOf((elapsedRealtime() - timeStamp)));
+//                timeStamp = elapsedRealtime();
+
                 ArrayList<String> phones = getPhones(contactId);
 
+//                Log.d("Line 4 ", String.valueOf((elapsedRealtime() - timeStamp)));
+//                timeStamp = elapsedRealtime();
+
                 ArrayList<String> emails = getEmails(contactId);
-
-
-                Contact contact = new Contact(photoUri, thumb, photo, contactId, contactName, emails, phones);
-                contacts.add(contact);
-                Log.d("Line 95 endOfWhile", String.valueOf((elapsedRealtime() - timeStamp)));
+                /*Log.d("Line 5 ", String.valueOf((elapsedRealtime() - timeStamp)));
                 timeStamp = elapsedRealtime();
+*/
+
+                Contact contact = new Contact(photoUri,/* thumb, photo,*/ contactId, contactName, emails, phones);
+                contacts.add(contact);
+//                Log.d("Line 6 ", String.valueOf((elapsedRealtime() - timeStamp)));
+//                timeStamp = elapsedRealtime();
                 //Log.d("ContactUri",contact.toString());
             } while (cursor.moveToNext());
-            Log.d("Line 96 endOfMethod", String.valueOf((elapsedRealtime() - timeStamp)));
+//            Log.d("Line 96 endOfMethod", String.valueOf( timeStamp2));
             cursor.close();
         }
 
@@ -243,7 +261,8 @@ public class ContactsProvider {
     }
 
     //call this method you get all contact information ....
-    public StringBuffer readContacts(Context context) {
+    public ArrayList<Contact> readContacts(Context context) {
+        ArrayList<Contact> contacts = new ArrayList<>();
         StringBuffer sb = new StringBuffer();
         sb.append("......Contact Details.....");
         ContentResolver cr = context.getContentResolver();
@@ -255,7 +274,8 @@ public class ContactsProvider {
         String emailType = null;
         String image_uri = "";
         Bitmap bitmap = null;
-
+        String emails = null;
+        String phones = null;
         if (cur.getCount() > 0) {
             while (cur.moveToNext()) {
                 String id = cur.getString(cur
@@ -281,6 +301,7 @@ public class ContactsProvider {
                         phone = pCur
                                 .getString(pCur
                                         .getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                        phones += phone +",";
                         sb.append("\n Phone number:" + phone);
                         System.out.println("phone" + phone);
                     }
@@ -298,6 +319,7 @@ public class ContactsProvider {
                         emailType = emailCur
                                 .getString(emailCur
                                         .getColumnIndex(ContactsContract.CommonDataKinds.Email.TYPE));
+                        emails += emailContact +",";
                         sb.append("\nEmail:" + emailContact + "Email type:" + emailType);
                         System.out.println("Email " + emailContact
                                 + " Email Type : " + emailType);
@@ -326,9 +348,65 @@ public class ContactsProvider {
 
                 }
                 sb.append("\n........................................");
-
+                String[] emailValues = emails.split(",");
+                String[] phoneValues = phones.split(",");
+                ArrayList<String> aEmails = new ArrayList<String>(Arrays.asList(emailValues));
+                ArrayList<String> aPhones = new ArrayList<String>(Arrays.asList(phoneValues));
+                Contact contact = new Contact(image_uri,/* thumb, photo,*/ id, name, aEmails, aPhones);
+                contacts.add(contact);
             }
         }
-        return sb;
+        return contacts;
+    }
+
+    public void contactsRead(){
+        ContentResolver contactResolver = context.getContentResolver();
+        Uri aContact = ContactsContract.Contacts.CONTENT_URI;
+        Cursor cursor = contactResolver.query(aContact, null, null, null, null);
+
+        if (cursor != null && cursor.moveToFirst()) {
+
+            String displayName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+            String photoUri = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.PHOTO_THUMBNAIL_URI));
+            String contactId = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+            String lookupKey = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.LOOKUP_KEY));
+
+            if (Integer.parseInt(cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0)
+            {
+                Cursor pCur = contactResolver.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                        null,
+                        ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?", new String[] { contactId }, null);
+
+                while (pCur.moveToNext())
+                {
+                    String phone = pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                    String type = pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
+                    String s = (String) ContactsContract.CommonDataKinds.Phone.getTypeLabel(context.getResources(), Integer.parseInt(type), "");
+
+
+                    Log.d("TAG", s + " phone: " + phone);
+                }
+
+                pCur.close();
+
+            }
+
+            Cursor emailCursor = contactResolver.query(ContactsContract.CommonDataKinds.Email.CONTENT_URI,
+                    null,
+                    ContactsContract.CommonDataKinds.Email.CONTACT_ID + " = ?", new String[] { contactId }, null);
+
+            while (emailCursor.moveToNext())
+            {
+                String phone = emailCursor.getString(emailCursor.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA));
+                int type = emailCursor.getInt(emailCursor.getColumnIndex(ContactsContract.CommonDataKinds.Email.TYPE));
+                String s = (String) ContactsContract.CommonDataKinds.Email.getTypeLabel(context.getResources(), type, "");
+
+                Log.d("TAG", s + " email: " + phone);
+            }
+
+            emailCursor.close();
+
+            cursor.close();
+        }
     }
 }

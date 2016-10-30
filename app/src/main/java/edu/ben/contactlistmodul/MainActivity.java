@@ -12,7 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 
-import edu.ben.contactlistmodul.contacts.ContactService;
+import edu.ben.contactlistmodul.contacts.ContactLoaderService;
 import edu.ben.contactlistmodul.decoratorUtils.DividerItemDecoration;
 import edu.ben.contactlistmodul.decoratorUtils.SpacesItemDecoration;
 import edu.ben.contactlistmodul.userPermission.UserPermission;
@@ -60,7 +60,8 @@ public class MainActivity extends AppCompatActivity {
 
     }
     private void loadContactList() {
-        new ContactService(this, mRecyclerView, mProgressBar).execute();
+        new ContactLoaderService(MainActivity.this,mRecyclerView).initLoaderManger();
+//        new ContactService(this, mRecyclerView, mProgressBar).execute();
     }
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
