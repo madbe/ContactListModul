@@ -29,59 +29,80 @@ public class ContactProviderAPI {
         return context.getContentResolver();
     }
 
-   /* public Cursor getCursor() {
+    public Cursor getCursor() {
         return cursor;
     }
 
     public void setCursor(Cursor cursor) {
-        this.cursor = cursor;
-    }*/
+        String sortOrder = "ContactsContract.Contacts.DISPLAY_NAME  ASC";
+        this.cursor = contentResolver.query(
+                ContactsContract.Contacts.CONTENT_URI,
+                null, null, null,
+                sortOrder);
+
+    }
 
     /**
-     * create a new contact list
-     * @return
+     * Create a new contact list
+     * Set only the id, name and photo uri
+     * @return ContactList
      */
     public ContactList newContactList() {
 
         ContactList contacts = new ContactList();
         String id;
-        String sortOrder = "ContactsContract.Contacts.DISPLAY_NAME  ASC";
+        //call setCursor and init the main cursor
+        setCursor(cursor);
 
-        cursor = contentResolver.query(
-                ContactsContract.Contacts.CONTENT_URI,
-                null, null, null,
-                sortOrder);
-
-        if (cursor != null && cursor.getCount() > 0) {
-            while (cursor.moveToNext()) {
+        if (getCursor() != null && getCursor().getCount() > 0) {
+            while (getCursor().moveToNext()) {
 
                 Contact c = new Contact();
 
                 //get the id, display name, photo uri
-                id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+                id = getCursor().getString(getCursor().getColumnIndex(ContactsContract.Contacts._ID));
                 c.setId(id);
-                c.setDisplayName(cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)));
-                c.setPhotoUri(cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.PHOTO_URI)));
-
-                //from here get the complex data: phone, email, notes, addresses, IM addresses, organization
-                if (Integer.parseInt(cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
-                    c.setPhone(this.getPhoneNumbers(id));
-                }
-
-                c.setEmail(this.getEmailAddresses(id));
-                c.setNotes(this.getContactNotes(id));
-                c.setAddresses(this.getContactAddresses(id));
-                c.setImAddresses(this.getIM(id));
-                c.setOrganization(this.getContactOrg(id));
+                c.setDisplayName(getCursor().getString(getCursor().getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)));
+                c.setPhotoUri(getCursor().getString(getCursor().getColumnIndex(ContactsContract.Contacts.PHOTO_URI)));
 
                 contacts.addContact(c);
             }
-            cursor.close();
+            getCursor().close();
         }
 
         return(contacts);
     }
 
+    /**
+     * Get the Contacts list ArrayList and fill the complex data for each Contact
+     * @param contactList the ContactList Array
+     * @return Full Details Contacts List
+     */
+    public ContactList  fullContactsDetailsList(ContactList contactList){
+        ArrayList<Contact> contacts = contactList.getContacts();
+        ContactList contactsList = new ContactList();
+
+        for (Contact contact : contacts) {
+            String id = contact.getId();
+            //from here get the complex data: phone, email, notes, addresses, IM addresses, organization
+            contact.setPhone(this.getPhoneNumbers(id));
+            contact.setEmail(this.getEmailAddresses(id));
+            contact.setNotes(this.getContactNotes(id));
+            contact.setAddresses(this.getContactAddresses(id));
+            contact.setImAddresses(this.getIM(id));
+            contact.setOrganization(this.getContactOrg(id));
+
+            contactList.addContact(contact);
+        }
+
+        return contactList;
+    }
+
+    /**
+     * get the contact phone numbers
+     * @param id Contact id
+     * @return ArrayList<Phone> Contact Phone numbers
+     */
     private ArrayList<Phone> getPhoneNumbers(String id) {
         ArrayList<Phone> phones = new ArrayList<Phone>();
 
@@ -91,7 +112,8 @@ public class ContactProviderAPI {
                 ContactsContract.CommonDataKinds.Phone.CONTACT_ID +" = ?",
                 new String[]{id}, null);
 
-        if (pCur != null) {
+
+        if (pCur != null && Integer.parseInt(pCur.getString(pCur.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
             while (pCur.moveToNext()) {
                 phones.add(new Phone(
                         pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
@@ -105,6 +127,11 @@ public class ContactProviderAPI {
         return(phones);
     }
 
+    /**
+     * Get the contact email address
+     * @param id Contact id
+     * @return ArrayList<Email> Contact Email's
+     */
     private ArrayList<Email> getEmailAddresses(String id) {
         ArrayList<Email> emails = new ArrayList<Email>();
 
