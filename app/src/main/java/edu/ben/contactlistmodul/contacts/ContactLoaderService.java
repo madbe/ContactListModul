@@ -126,8 +126,8 @@ public class ContactLoaderService implements LoaderManager.LoaderCallbacks<Curso
             Log.e("Cursor close 1", "----------------");
         }
         //phones.close();
-        mAdapter = new ContactAdapter(contacts);
-        mContactRecycler.setAdapter(mAdapter);
+       /* mAdapter = new ContactAdapter(contacts);
+        mContactRecycler.setAdapter(mAdapter);*/
     }
 
     @Override

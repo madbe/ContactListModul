@@ -8,7 +8,6 @@ import android.widget.ProgressBar;
 
 import java.util.ArrayList;
 
-import edu.ben.contactlistmodul.adapter.ContactAdapter;
 import edu.ben.contactlistmodul.models.Contact;
 
 public class ContactService extends AsyncTask<Void, Integer, ArrayList<Contact>> {
@@ -43,8 +42,8 @@ public class ContactService extends AsyncTask<Void, Integer, ArrayList<Contact>>
         super.onPostExecute(contacts);
 
         mProgressBar.setVisibility(View.GONE);
-        ContactAdapter adapter = new ContactAdapter(contacts);
-        mContactRecycler.setAdapter(adapter);
+//        ContactAdapter adapter = new ContactAdapter(contacts);
+//        mContactRecycler.setAdapter(adapter);
 
     }
 }

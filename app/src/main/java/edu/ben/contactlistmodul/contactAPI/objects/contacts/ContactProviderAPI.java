@@ -20,7 +20,7 @@ public class ContactProviderAPI {
     private ContentResolver contentResolver;
 
 
-    public ContactProviderAPI(Context context) {
+    ContactProviderAPI(Context context) {
         this.context = context;
         this.contentResolver = getContentResolver();
     }
@@ -29,17 +29,15 @@ public class ContactProviderAPI {
         return context.getContentResolver();
     }
 
-    public Cursor getCursor() {
+    private Cursor getCursor() {
         return cursor;
     }
 
-    public void setCursor(Cursor cursor) {
-        String sortOrder = "ContactsContract.Contacts.DISPLAY_NAME  ASC";
+    private void setCursor(Cursor cursor) {
         this.cursor = contentResolver.query(
                 ContactsContract.Contacts.CONTENT_URI,
                 null, null, null,
-                sortOrder);
-
+                ContactsContract.Contacts.DISPLAY_NAME + " ASC");
     }
 
     /**
@@ -78,7 +76,7 @@ public class ContactProviderAPI {
      * @param contactList the ContactList Array
      * @return Full Details Contacts List
      */
-    public ContactList  fullContactsDetailsList(ContactList contactList){
+    public ContactList  setFullContactsDetailsList(ContactList contactList){
         ArrayList<Contact> contacts = contactList.getContacts();
         ContactList contactsList = new ContactList();
 
@@ -92,10 +90,26 @@ public class ContactProviderAPI {
             contact.setImAddresses(this.getIM(id));
             contact.setOrganization(this.getContactOrg(id));
 
-            contactList.addContact(contact);
+            contactsList.addContact(contact);
         }
 
         return contactList;
+    }
+
+    //TODO: Check if is best to move this Method to the Contact class and call it from there.
+    /**
+     * Get a specific Contact and set is complex details
+     * @param contact the Contact
+     */
+    public void setFullContactDetails(Contact contact){
+        String id = contact.getId();
+        //from here get the complex data: phone, email, notes, addresses, IM addresses, organization
+        contact.setPhone(this.getPhoneNumbers(id));
+        contact.setEmail(this.getEmailAddresses(id));
+        contact.setNotes(this.getContactNotes(id));
+        contact.setAddresses(this.getContactAddresses(id));
+        contact.setImAddresses(this.getIM(id));
+        contact.setOrganization(this.getContactOrg(id));
     }
 
     /**
@@ -113,7 +127,7 @@ public class ContactProviderAPI {
                 new String[]{id}, null);
 
 
-        if (pCur != null && Integer.parseInt(pCur.getString(pCur.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
+        if (pCur != null /*&& Integer.parseInt(pCur.getString(pCur.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0*/) {
             while (pCur.moveToNext()) {
                 phones.add(new Phone(
                         pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
@@ -154,6 +168,11 @@ public class ContactProviderAPI {
         return(emails);
     }
 
+    /**
+     * Get the Contact Note's
+     * @param id Contact id
+     * @return ArrayList of Note's
+     */
     private ArrayList<String> getContactNotes(String id) {
         ArrayList<String> notes = new ArrayList<String>();
         String where = ContactsContract.Data.CONTACT_ID + " = ? AND " + ContactsContract.Data.MIMETYPE + " = ?";
@@ -172,6 +191,11 @@ public class ContactProviderAPI {
         return(notes);
     }
 
+    /**
+     * Get The Contact Addresses
+     * @param id Contact id
+     * @return ArrayList of the Contact Addresses
+     */
     private ArrayList<Address> getContactAddresses(String id) {
         ArrayList<Address> addrList = new ArrayList<Address>();
 
@@ -198,6 +222,11 @@ public class ContactProviderAPI {
         return(addrList);
     }
 
+    /**
+     * Get the Contact IM
+     * @param id Contact id
+     * @return ArrayList of the Contact IM's
+     */
     private ArrayList<IM> getIM(String id) {
         ArrayList<IM> imList = new ArrayList<IM>();
         String where = ContactsContract.Data.CONTACT_ID + " = ? AND " + ContactsContract.Data.MIMETYPE + " = ?";
@@ -220,6 +249,11 @@ public class ContactProviderAPI {
         return(imList);
     }
 
+    /**
+     * Get the Contact Organization
+     * @param id Contact id
+     * @return Contact Organization
+     */
     private Organization getContactOrg(String id) {
         Organization org = new Organization();
         String where = ContactsContract.Data.CONTACT_ID + " = ? AND " + ContactsContract.Data.MIMETYPE + " = ?";

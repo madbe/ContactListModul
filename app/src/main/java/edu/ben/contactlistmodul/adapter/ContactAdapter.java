@@ -13,14 +13,17 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 
 import edu.ben.contactlistmodul.R;
-import edu.ben.contactlistmodul.models.Contact;
+import edu.ben.contactlistmodul.contactAPI.objects.contacts.ContactList;
+import edu.ben.contactlistmodul.contactAPI.objects.models.Contact;
+import edu.ben.contactlistmodul.contactAPI.objects.models.Phone;
+
 
 public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactViewHolder> {
 
     private final ArrayList<Contact> contactList;
 
-    public ContactAdapter(ArrayList<Contact> contactList) {
-        this.contactList = contactList;
+    public ContactAdapter(ContactList contactList) {
+        this.contactList = contactList.getContacts();
     }
 
     @Override
@@ -40,8 +43,8 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
         String path = contact.getPhotoUri();
         Picasso.with(holder.layout.getContext()).load(path).resize(50,50).centerInside().into(holder.mContactPhoto);
         //holder.mContactPhoto.setImageBitmap(contact.getPhoto());
-        holder.mContactName.setText(contact.getName());
-        ArrayList<String> phones = contact.getPhones();
+        holder.mContactName.setText(contact.getDisplayName());
+        ArrayList<Phone> phones = contact.getPhone();
         //holder.mContactPhoneNo.setText(phones.get(0));
         //here we add the holder layout object
     }
