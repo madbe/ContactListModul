@@ -45,7 +45,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
         //holder.mContactPhoto.setImageBitmap(contact.getPhoto());
         holder.mContactName.setText(contact.getDisplayName());
         ArrayList<Phone> phones = contact.getPhone();
-        //holder.mContactPhoneNo.setText(phones.get(0));
+        holder.mContactPhoneNo.setText(phones.get(0).getNumber());
         //here we add the holder layout object
     }
 
