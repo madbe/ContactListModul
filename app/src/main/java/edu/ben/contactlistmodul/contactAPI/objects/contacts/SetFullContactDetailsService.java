@@ -29,6 +29,7 @@ public class SetFullContactDetailsService extends AsyncTask<ContactList, Integer
         super.onPostExecute(contactList);
 
         ContactAdapter adapter = new ContactAdapter(contactList);
-        mContactRecycler.setAdapter(adapter);
+        mContactRecycler.swapAdapter(adapter, true);
+//        mContactRecycler.setAdapter(adapter);
     }
 }
