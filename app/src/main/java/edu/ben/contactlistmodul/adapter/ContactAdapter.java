@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import edu.ben.contactlistmodul.R;
 import edu.ben.contactlistmodul.contactAPI.objects.contacts.ContactList;
 import edu.ben.contactlistmodul.contactAPI.objects.models.Contact;
-import edu.ben.contactlistmodul.contactAPI.objects.models.Phone;
 
 
 public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactViewHolder> {
@@ -44,10 +43,14 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
         Picasso.with(holder.layout.getContext()).load(path).resize(50,50).centerInside().into(holder.mContactPhoto);
         //holder.mContactPhoto.setImageBitmap(contact.getPhoto());
         holder.mContactName.setText(contact.getDisplayName());
-        ArrayList<Phone> phones = contact.getPhone();
-        if (phones != null) {
-            holder.mContactPhoneNo.setVisibility(View.VISIBLE);
-//            holder.mContactPhoneNo.setText(phones.get(0).getNumber());
+        if (contact.getPhone() != null){
+            if (contact.getPhone().size() > 0) {
+                String phoneNumber = contact.getPhone().get(0).getNumber();
+                holder.mContactPhoneNo.setVisibility(View.VISIBLE);
+                holder.mContactPhoneNo.setText(phoneNumber);
+            }
+        } else {
+
         }
         //here we add the holder layout object
     }

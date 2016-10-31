@@ -52,19 +52,22 @@ public class ContactProviderAPI {
         //call setCursor and init the main cursor
         setCursor(cursor);
 
-        if (getCursor() != null && getCursor().getCount() > 0) {
-            while (getCursor().moveToNext()) {
+        try {
+            if (getCursor() != null && getCursor().getCount() > 0) {
+                while (getCursor().moveToNext()) {
 
-                Contact c = new Contact();
+                    Contact c = new Contact();
 
-                //get the id, display name, photo uri
-                id = getCursor().getString(getCursor().getColumnIndex(ContactsContract.Contacts._ID));
-                c.setId(id);
-                c.setDisplayName(getCursor().getString(getCursor().getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)));
-                c.setPhotoUri(getCursor().getString(getCursor().getColumnIndex(ContactsContract.Contacts.PHOTO_URI)));
+                    //get the id, display name, photo uri
+                    id = getCursor().getString(getCursor().getColumnIndex(ContactsContract.Contacts._ID));
+                    c.setId(id);
+                    c.setDisplayName(getCursor().getString(getCursor().getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)));
+                    c.setPhotoUri(getCursor().getString(getCursor().getColumnIndex(ContactsContract.Contacts.PHOTO_URI)));
 
-                contacts.addContact(c);
+                    contacts.addContact(c);
+                }
             }
+        } finally {
             getCursor().close();
         }
 
@@ -126,16 +129,19 @@ public class ContactProviderAPI {
                 ContactsContract.CommonDataKinds.Phone.CONTACT_ID +" = ?",
                 new String[]{id}, null);
 
-
-        if (pCur != null /*&& Integer.parseInt(pCur.getString(pCur.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0*/) {
-            while (pCur.moveToNext()) {
-                phones.add(new Phone(
-                        pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
-                        , pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE))
-                ));
-
+        try {
+            if (pCur != null /*&& Integer.parseInt(pCur.getString(pCur.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0*/) {
+                while (pCur.moveToNext()) {
+                    phones.add(new Phone(
+                            pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
+                            , pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE))
+                    ));
+                }
             }
-            pCur.close();
+        } finally {
+            if (pCur != null) {
+                pCur.close();
+            }
         }
 
         return(phones);
@@ -154,15 +160,21 @@ public class ContactProviderAPI {
                 null,
                 ContactsContract.CommonDataKinds.Email.CONTACT_ID + " = ?",
                 new String[]{id}, null);
-        if (emailCur != null) {
-            while (emailCur.moveToNext()) {
-                // This would allow you get several email addresses
-                Email e = new Email(emailCur.getString(emailCur.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA))
-                        ,emailCur.getString(emailCur.getColumnIndex(ContactsContract.CommonDataKinds.Email.TYPE))
-                );
-                emails.add(e);
+
+        try {
+            if (emailCur != null) {
+                while (emailCur.moveToNext()) {
+                    // This would allow you get several email addresses
+                    Email e = new Email(emailCur.getString(emailCur.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA))
+                            ,emailCur.getString(emailCur.getColumnIndex(ContactsContract.CommonDataKinds.Email.TYPE))
+                    );
+                    emails.add(e);
+                }
             }
-            emailCur.close();
+        } finally {
+            if (emailCur != null) {
+                emailCur.close();
+            }
         }
 
         return(emails);
@@ -178,14 +190,25 @@ public class ContactProviderAPI {
         String where = ContactsContract.Data.CONTACT_ID + " = ? AND " + ContactsContract.Data.MIMETYPE + " = ?";
         String[] whereParameters = new String[]{id,
                 ContactsContract.CommonDataKinds.Note.CONTENT_ITEM_TYPE};
-        Cursor noteCur = contentResolver.query(ContactsContract.Data.CONTENT_URI, null, where, whereParameters, null);
-        if (noteCur != null && noteCur.moveToFirst()) {
-            String note = noteCur.getString(noteCur.getColumnIndex(ContactsContract.CommonDataKinds.Note.NOTE));
-            if (note.length() > 0) {
-                notes.add(note);
-            }
 
-            noteCur.close();
+        Cursor noteCur = contentResolver.query(
+                ContactsContract.Data.CONTENT_URI,
+                null,
+                where,
+                whereParameters,
+                null);
+
+        try {
+            if (noteCur != null && noteCur.moveToFirst()) {
+                String note = noteCur.getString(noteCur.getColumnIndex(ContactsContract.CommonDataKinds.Note.NOTE));
+                if (note.length() > 0) {
+                    notes.add(note);
+                }
+            }
+        } finally {
+            if (noteCur != null) {
+                noteCur.close();
+            }
         }
 
         return(notes);
@@ -204,21 +227,27 @@ public class ContactProviderAPI {
                 ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE};
 
         Cursor addrCur = contentResolver.query(ContactsContract.Data.CONTENT_URI, null, where, whereParameters, null);
+        try {
+            if (addrCur != null) {
+                while (addrCur.moveToNext()) {
+                    String poBox = addrCur.getString(addrCur.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.POBOX));
+                    String street = addrCur.getString(addrCur.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.STREET));
+                    String city = addrCur.getString(addrCur.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.CITY));
+                    String state = addrCur.getString(addrCur.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.REGION));
+                    String postalCode = addrCur.getString(addrCur.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.POSTCODE));
+                    String country = addrCur.getString(addrCur.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.COUNTRY));
+                    String type = addrCur.getString(addrCur.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.TYPE));
+                    Address a = new Address(poBox, street, city, state, postalCode, country, type);
+                    addrList.add(a);
+                }
 
-        if (addrCur != null) {
-            while (addrCur.moveToNext()) {
-                String poBox = addrCur.getString(addrCur.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.POBOX));
-                String street = addrCur.getString(addrCur.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.STREET));
-                String city = addrCur.getString(addrCur.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.CITY));
-                String state = addrCur.getString(addrCur.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.REGION));
-                String postalCode = addrCur.getString(addrCur.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.POSTCODE));
-                String country = addrCur.getString(addrCur.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.COUNTRY));
-                String type = addrCur.getString(addrCur.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.TYPE));
-                Address a = new Address(poBox, street, city, state, postalCode, country, type);
-                addrList.add(a);
             }
-            addrCur.close();
+        } finally {
+            if (addrCur != null) {
+                addrCur.close();
+            }
         }
+
         return(addrList);
     }
 
@@ -235,15 +264,21 @@ public class ContactProviderAPI {
 
         Cursor imCur = contentResolver.query(ContactsContract.Data.CONTENT_URI, null, where, whereParameters, null);
 
-        if (imCur != null && imCur.moveToFirst()) {
-            String imName = imCur.getString(imCur.getColumnIndex(ContactsContract.CommonDataKinds.Im.DATA));
-            String imType;
-            imType = imCur.getString(imCur.getColumnIndex(ContactsContract.CommonDataKinds.Im.TYPE));
-            if (imName.length() > 0) {
-                IM im = new IM(imName, imType);
-                imList.add(im);
+        try {
+            if (imCur != null && imCur.moveToFirst()) {
+                String imName = imCur.getString(imCur.getColumnIndex(ContactsContract.CommonDataKinds.Im.DATA));
+                String imType;
+                imType = imCur.getString(imCur.getColumnIndex(ContactsContract.CommonDataKinds.Im.TYPE));
+                if (imName.length() > 0) {
+                    IM im = new IM(imName, imType);
+                    imList.add(im);
+                }
+
             }
-            imCur.close();
+        } finally {
+            if (imCur != null) {
+                imCur.close();
+            }
         }
 
         return(imList);
@@ -262,14 +297,20 @@ public class ContactProviderAPI {
 
         Cursor orgCur = contentResolver.query(ContactsContract.Data.CONTENT_URI, null, where, whereParameters, null);
 
-        if (orgCur != null && orgCur.moveToFirst()) {
-            String orgName = orgCur.getString(orgCur.getColumnIndex(ContactsContract.CommonDataKinds.Organization.DATA));
-            String title = orgCur.getString(orgCur.getColumnIndex(ContactsContract.CommonDataKinds.Organization.TITLE));
-            if (orgName.length() > 0) {
-                org.setOrganization(orgName);
-                org.setTitle(title);
+        try {
+            if (orgCur != null && orgCur.moveToFirst()) {
+                String orgName = orgCur.getString(orgCur.getColumnIndex(ContactsContract.CommonDataKinds.Organization.DATA));
+                String title = orgCur.getString(orgCur.getColumnIndex(ContactsContract.CommonDataKinds.Organization.TITLE));
+                if (orgName.length() > 0) {
+                    org.setOrganization(orgName);
+                    org.setTitle(title);
+                }
+
             }
-            orgCur.close();
+        } finally {
+            if (orgCur != null) {
+                orgCur.close();
+            }
         }
 
         return(org);
