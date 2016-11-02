@@ -128,6 +128,7 @@ public class SearchContactsActivity extends AppCompatActivity implements AsyncRe
 
     @Override
     public void processFinish(SearchContactsAdapter outputAdapter) {
+        //init the local adapter with the output adapter
         mSContactsAdapter = outputAdapter;
     }
 }
