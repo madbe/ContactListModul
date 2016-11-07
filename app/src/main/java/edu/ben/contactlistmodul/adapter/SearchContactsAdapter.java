@@ -1,16 +1,19 @@
 package edu.ben.contactlistmodul.adapter;
 
 import android.support.constraint.ConstraintLayout;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
-import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.pkmmte.view.CircularImageView;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -38,7 +41,7 @@ public class SearchContactsAdapter extends
     }
 
     @Override
-    public void onBindViewHolder(SearchContactViewHolder holder, int position) {
+    public void onBindViewHolder(final SearchContactViewHolder holder, final int position) {
         Contact contact = contactList.get(position);
         holder.contact = contact;
 
@@ -52,9 +55,34 @@ public class SearchContactsAdapter extends
                 holder.mContactPhoneNo.setVisibility(View.VISIBLE);
                 holder.mContactPhoneNo.setText(phoneNumber);
             }
-        } else {
-
         }
+        holder.mOptionDigit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View view) {
+                //Display Option menu
+                PopupMenu popupMenu = new PopupMenu(view.getContext(),holder.mOptionDigit);
+                popupMenu.inflate(R.menu.menu_option);
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()){
+                            case R.id.menu_action_add:
+                                Toast.makeText(view.getContext(),holder.contact.getDisplayName() +"",Toast.LENGTH_LONG).show();
+                                break;
+                            case R.id.menu_action_delete:
+                                Toast.makeText(view.getContext(),holder.contact.getDisplayName() +" Deleted",Toast.LENGTH_LONG).show();
+                                contactList.remove(position);
+                                notifyDataSetChanged();
+                                break;
+                            default:
+                                break;
+                        }
+                        return false;
+                    }
+                });
+                popupMenu.show();
+            }
+        });
         //here we add the holder layout object
     }
 
@@ -66,8 +94,8 @@ public class SearchContactsAdapter extends
     public class SearchContactViewHolder extends RecyclerView.ViewHolder {
 
         private ConstraintLayout layout;
-        TextView mContactName, mContactPhoneNo;
-        ImageView mContactPhoto;
+        TextView mContactName, mContactPhoneNo, mOptionDigit;
+        CircularImageView mContactPhoto;
         Contact contact;
 
         public SearchContactViewHolder(View view) {
@@ -75,7 +103,8 @@ public class SearchContactsAdapter extends
             layout = (ConstraintLayout) view.findViewById(R.id.contact_layout);
             mContactName = (TextView) view.findViewById(R.id.tv_disply_name);
             mContactPhoneNo = (TextView) view.findViewById(R.id.tv_phone_no);
-            mContactPhoto = (ImageView) view.findViewById(R.id.iv_contact_photo);
+            mOptionDigit = (TextView) view.findViewById(R.id.tv_option_digit);
+            mContactPhoto = (CircularImageView) view.findViewById(R.id.iv_contact_photo);
         }
     }
 
@@ -109,6 +138,7 @@ public class SearchContactsAdapter extends
             }
 
             @Override
+            @SuppressWarnings("unchecked")
             protected void publishResults(CharSequence constraint, FilterResults results) {
                 contactList = (ArrayList<Contact>) results.values;
                 notifyDataSetChanged();

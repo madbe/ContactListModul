@@ -1,5 +1,7 @@
 package edu.ben.contactlistmodul.adapter;
 
+import edu.ben.contactlistmodul.contactAPI.objects.contacts.ContactList;
+
 /**
  * 1. This Interface is allows us to pass back the searchContactsAdapter to the
 *     Activity after we init the adapter in the AsyncTask services.
@@ -16,5 +18,5 @@ package edu.ben.contactlistmodul.adapter;
  */
 
 public interface AsyncResponse {
-    void processFinish(SearchContactsAdapter outputAdapter);
+    void processFinish(SearchContactsAdapter outputAdapter, ContactList contacts);
 }

@@ -18,6 +18,7 @@ import java.util.ArrayList;
 
 import edu.ben.contactlistmodul.adapter.AsyncResponse;
 import edu.ben.contactlistmodul.adapter.SearchContactsAdapter;
+import edu.ben.contactlistmodul.contactAPI.objects.contacts.ContactList;
 import edu.ben.contactlistmodul.contactAPI.objects.contacts.SearchContactsService;
 import edu.ben.contactlistmodul.decoratorUtils.DividerItemDecoration;
 import edu.ben.contactlistmodul.decoratorUtils.SpacesItemDecoration;
@@ -25,15 +26,15 @@ import edu.ben.contactlistmodul.decoratorUtils.SpacesItemDecoration;
 public class SearchContactsActivity extends AppCompatActivity implements AsyncResponse {
 
     private MaterialSearchView searchView;
-    private RecyclerView mRecyclerView;
     private SearchContactsAdapter mSContactsAdapter;
-    private SearchContactsService contactsService = null;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_contacts);
 
-        mRecyclerView = (RecyclerView)findViewById(R.id.search_contacts_recycler);
+        RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.search_contacts_recycler);
         //add divider decoration to the item in the recycler
         RecyclerView.ItemDecoration itemDecoration = new
                 DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST);
@@ -44,8 +45,9 @@ public class SearchContactsActivity extends AppCompatActivity implements AsyncRe
         mRecyclerView.addItemDecoration(decoration);
         //enable optimizations if all item views are of the same height and width
         mRecyclerView.setHasFixedSize(true);
-        contactsService = new SearchContactsService(this, mRecyclerView, mSContactsAdapter);
-        getContactListName();
+
+        //execute the async task
+        new SearchContactsService(this, this, mRecyclerView, mSContactsAdapter).execute();
 
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         ActionBar actionBar = getSupportActionBar();
@@ -56,6 +58,7 @@ public class SearchContactsActivity extends AppCompatActivity implements AsyncRe
 
         searchView = (MaterialSearchView) findViewById(R.id.search_view);
         searchView.setVoiceSearch(true); //or false
+
         searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -65,13 +68,12 @@ public class SearchContactsActivity extends AppCompatActivity implements AsyncRe
 
             @Override
             public boolean onQueryTextChange(String newText) {
-               /* if ( TextUtils.isEmpty ( newText ) ) {
-                    mSContactsAdapter.getFilter().filter("");
+                if (mSContactsAdapter != null) {
+                    mSContactsAdapter.filterSearchText(newText);
+                    return true;
                 } else {
-                    mSContactsAdapter.getFilter().filter(newText);
-                }*/
-                mSContactsAdapter.filterSearchText(newText);
-                return true;
+                    return false;
+                }
             }
         });
 
@@ -88,10 +90,6 @@ public class SearchContactsActivity extends AppCompatActivity implements AsyncRe
         });
     }
 
-    private void getContactListName() {
-        contactsService.delegate = this;
-        contactsService.execute();
-    }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
@@ -126,8 +124,13 @@ public class SearchContactsActivity extends AppCompatActivity implements AsyncRe
         }
     }
 
+    /**
+     * Implement the AsyncResponse method
+     * @param outputAdapter THe init adapter from the AsyncTask.
+     * @param contacts
+     */
     @Override
-    public void processFinish(SearchContactsAdapter outputAdapter) {
+    public void processFinish(SearchContactsAdapter outputAdapter, ContactList contacts) {
         //init the local adapter with the output adapter
         mSContactsAdapter = outputAdapter;
     }

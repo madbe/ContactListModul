@@ -5,9 +5,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.pkmmte.view.CircularImageView;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -49,9 +49,8 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
                 holder.mContactPhoneNo.setVisibility(View.VISIBLE);
                 holder.mContactPhoneNo.setText(phoneNumber);
             }
-        } else {
-
         }
+
         //here we add the holder layout object
     }
 
@@ -62,8 +61,8 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
 
     public class ContactViewHolder extends RecyclerView.ViewHolder {
         private ConstraintLayout layout;
-        TextView mContactName, mContactPhoneNo;
-        ImageView mContactPhoto;
+        TextView mContactName, mContactPhoneNo, mOptionDigit;
+        CircularImageView mContactPhoto;
         Contact contact;
 
         public ContactViewHolder(View view) {
@@ -71,7 +70,8 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
             layout = (ConstraintLayout) view.findViewById(R.id.contact_layout);
             mContactName = (TextView) view.findViewById(R.id.tv_disply_name);
             mContactPhoneNo = (TextView) view.findViewById(R.id.tv_phone_no);
-            mContactPhoto = (ImageView) view.findViewById(R.id.iv_contact_photo);
+            mOptionDigit = (TextView) view.findViewById(R.id.tv_option_digit);
+            mContactPhoto = (CircularImageView) view.findViewById(R.id.iv_contact_photo);
 
         }
     }

@@ -15,10 +15,11 @@ public class SearchContactsService extends AsyncTask<Void, Void, ContactList> {
     //declare the Interface as a field and set it to null
     public AsyncResponse delegate = null;
 
-    public SearchContactsService(Context context, RecyclerView mContactRecycler, SearchContactsAdapter mSContactsAdapter) {
+    public SearchContactsService(Context context, AsyncResponse delegate, RecyclerView mContactRecycler, SearchContactsAdapter mSContactsAdapter) {
         this.context = context;
         this.mContactRecycler = mContactRecycler;
         this.mSContactsAdapter = mSContactsAdapter;
+        this.delegate = delegate;
     }
 
 
@@ -39,6 +40,6 @@ public class SearchContactsService extends AsyncTask<Void, Void, ContactList> {
         mContactRecycler.setAdapter(mSContactsAdapter);
         //In the onPostExecute we call the processFinish method from the interface class
         //and pass it the init adapter.
-        delegate.processFinish(mSContactsAdapter);
+        delegate.processFinish(mSContactsAdapter, contacts);
     }
 }
