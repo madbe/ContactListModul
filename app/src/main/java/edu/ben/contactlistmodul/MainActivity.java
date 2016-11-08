@@ -13,16 +13,26 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 
+import java.util.ArrayList;
+
+import edu.ben.contactlistmodul.adapter.AsyncResponse;
+import edu.ben.contactlistmodul.adapter.SearchContactsAdapter;
+import edu.ben.contactlistmodul.contactAPI.objects.contacts.ContactList;
 import edu.ben.contactlistmodul.contactAPI.objects.contacts.ContactService;
+import edu.ben.contactlistmodul.contactAPI.objects.models.Contact;
 import edu.ben.contactlistmodul.decoratorUtils.DividerItemDecoration;
 import edu.ben.contactlistmodul.decoratorUtils.SpacesItemDecoration;
 import edu.ben.contactlistmodul.userPermission.UserPermission;
+import edu.ben.contactlistmodul.utilis.Constants;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements AsyncResponse{
 
     FloatingActionButton fab;
     private RecyclerView mRecyclerView;
     private ProgressBar mProgressBar;
+    private ContactList contactList = null;
+    private ArrayList<Contact> contacts = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,8 +58,11 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 Intent intent = new Intent(MainActivity.this, SearchContactsActivity.class);
+                intent.putExtra(Constants.EXTRA_CONTACT_LIST, contactList);
                 startActivity(intent);
+
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
@@ -64,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
     }
     private void loadContactList() {
 //        new ContactLoaderService(MainActivity.this,mRecyclerView).initLoaderManger();
-        new ContactService(this, mRecyclerView, mProgressBar).execute();
+        new ContactService(this, this, mRecyclerView, mProgressBar).execute();
     }
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -94,5 +107,15 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void processFinish(ContactList contacts) {
+        contactList = contacts;
+    }
+
+    @Override
+    public void processFinish(SearchContactsAdapter outputAdapter, ContactList contacts) {
+
     }
 }

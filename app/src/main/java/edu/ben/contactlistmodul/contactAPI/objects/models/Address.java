@@ -3,7 +3,10 @@ package edu.ben.contactlistmodul.contactAPI.objects.models;
 /*The Address class is the only class in the ContactList framework that actually does any work.
 Android 2.0 has individual data columns for PO-Box, street, city, region, postal code, country.*/
 
-public class Address {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Address implements Parcelable {
     private String poBox;
     private String street;
     private String city;
@@ -77,4 +80,43 @@ public class Address {
     public void setType(String type) {
         this.type = type;
     }
+
+    //Parcelable
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.poBox);
+        dest.writeString(this.street);
+        dest.writeString(this.city);
+        dest.writeString(this.state);
+        dest.writeString(this.postalCode);
+        dest.writeString(this.country);
+        dest.writeString(this.type);
+    }
+
+    protected Address(Parcel in) {
+        this.poBox = in.readString();
+        this.street = in.readString();
+        this.city = in.readString();
+        this.state = in.readString();
+        this.postalCode = in.readString();
+        this.country = in.readString();
+        this.type = in.readString();
+    }
+
+    public static final Parcelable.Creator<Address> CREATOR = new Parcelable.Creator<Address>() {
+        @Override
+        public Address createFromParcel(Parcel source) {
+            return new Address(source);
+        }
+
+        @Override
+        public Address[] newArray(int size) {
+            return new Address[size];
+        }
+    };
 }

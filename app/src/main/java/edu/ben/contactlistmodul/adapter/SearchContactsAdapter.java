@@ -41,14 +41,22 @@ public class SearchContactsAdapter extends
     }
 
     @Override
-    public void onBindViewHolder(final SearchContactViewHolder holder, final int position) {
+    public void onBindViewHolder(final SearchContactViewHolder holder, int position) {
         Contact contact = contactList.get(position);
         holder.contact = contact;
+        holder.positionListener(position);
 
         String path = contact.getPhotoUri();
-        Picasso.with(holder.layout.getContext()).load(path).resize(50,50).centerInside().into(holder.mContactPhoto);
+        Picasso.with(holder.layout.getContext())
+                .load(path)
+                .resize(50,50)
+                .placeholder(R.drawable.avatar_placeholder)
+                .error(R.drawable.avatar_placeholder_error)
+                .centerInside()
+                .into(holder.mContactPhoto);
         //holder.mContactPhoto.setImageBitmap(contact.getPhoto());
         holder.mContactName.setText(contact.getDisplayName());
+
         if (contact.getPhone() != null){
             if (contact.getPhone().size() > 0) {
                 String phoneNumber = contact.getPhone().get(0).getNumber();
@@ -56,6 +64,7 @@ public class SearchContactsAdapter extends
                 holder.mContactPhoneNo.setText(phoneNumber);
             }
         }
+
         holder.mOptionDigit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
@@ -71,7 +80,7 @@ public class SearchContactsAdapter extends
                                 break;
                             case R.id.menu_action_delete:
                                 Toast.makeText(view.getContext(),holder.contact.getDisplayName() +" Deleted",Toast.LENGTH_LONG).show();
-                                contactList.remove(position);
+                                contactList.remove(holder.mPosition);
                                 notifyDataSetChanged();
                                 break;
                             default:
@@ -91,12 +100,13 @@ public class SearchContactsAdapter extends
         return contactList.size();
     }
 
-    public class SearchContactViewHolder extends RecyclerView.ViewHolder {
+    public class SearchContactViewHolder extends RecyclerView.ViewHolder implements OnBindViewHolderPosition {
 
         private ConstraintLayout layout;
         TextView mContactName, mContactPhoneNo, mOptionDigit;
         CircularImageView mContactPhoto;
         Contact contact;
+        private int mPosition;
 
         public SearchContactViewHolder(View view) {
             super(view);
@@ -105,6 +115,11 @@ public class SearchContactsAdapter extends
             mContactPhoneNo = (TextView) view.findViewById(R.id.tv_phone_no);
             mOptionDigit = (TextView) view.findViewById(R.id.tv_option_digit);
             mContactPhoto = (CircularImageView) view.findViewById(R.id.iv_contact_photo);
+        }
+
+        @Override
+        public void positionListener(int position) {
+            mPosition = position;
         }
     }
 
@@ -157,5 +172,13 @@ public class SearchContactsAdapter extends
         } else {
             getFilter().filter(newText);
         }
+    }
+
+    /**
+     * The Interface get the position on the onBindViewHolder and use it inside
+     * the innerclass to remove contact from the list.
+     */
+    interface OnBindViewHolderPosition {
+        public void positionListener(int position);
     }
 }

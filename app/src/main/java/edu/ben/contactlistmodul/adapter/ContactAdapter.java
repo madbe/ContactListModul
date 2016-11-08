@@ -40,7 +40,13 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
         holder.contact = contact;
 
         String path = contact.getPhotoUri();
-        Picasso.with(holder.layout.getContext()).load(path).resize(50,50).centerInside().into(holder.mContactPhoto);
+        Picasso.with(holder.layout.getContext())
+                .load(path)
+                .resize(50,50)
+                .placeholder(R.drawable.avatar_placeholder)
+                .error(R.drawable.avatar_placeholder_error)
+                .centerInside()
+                .into(holder.mContactPhoto);
         //holder.mContactPhoto.setImageBitmap(contact.getPhoto());
         holder.mContactName.setText(contact.getDisplayName());
         if (contact.getPhone() != null){

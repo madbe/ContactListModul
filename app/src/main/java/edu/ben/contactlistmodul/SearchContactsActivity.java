@@ -16,14 +16,13 @@ import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
 import java.util.ArrayList;
 
-import edu.ben.contactlistmodul.adapter.AsyncResponse;
 import edu.ben.contactlistmodul.adapter.SearchContactsAdapter;
 import edu.ben.contactlistmodul.contactAPI.objects.contacts.ContactList;
-import edu.ben.contactlistmodul.contactAPI.objects.contacts.SearchContactsService;
 import edu.ben.contactlistmodul.decoratorUtils.DividerItemDecoration;
 import edu.ben.contactlistmodul.decoratorUtils.SpacesItemDecoration;
+import edu.ben.contactlistmodul.utilis.Constants;
 
-public class SearchContactsActivity extends AppCompatActivity implements AsyncResponse {
+public class SearchContactsActivity extends AppCompatActivity /*implements AsyncResponse*/ {
 
     private MaterialSearchView searchView;
     private SearchContactsAdapter mSContactsAdapter;
@@ -46,8 +45,13 @@ public class SearchContactsActivity extends AppCompatActivity implements AsyncRe
         //enable optimizations if all item views are of the same height and width
         mRecyclerView.setHasFixedSize(true);
 
+        Intent intent = getIntent();
+        ContactList contactList = intent.getParcelableExtra(Constants.EXTRA_CONTACT_LIST);
+
+        mSContactsAdapter = new SearchContactsAdapter(contactList);
+        mRecyclerView.setAdapter(mSContactsAdapter);
         //execute the async task
-        new SearchContactsService(this, this, mRecyclerView, mSContactsAdapter).execute();
+        //new SearchContactsService(this, this, mRecyclerView, mSContactsAdapter).execute();
 
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         ActionBar actionBar = getSupportActionBar();
@@ -124,14 +128,19 @@ public class SearchContactsActivity extends AppCompatActivity implements AsyncRe
         }
     }
 
-    /**
+    /*@Override
+    public void processFinish(ContactList contacts) {
+
+    }
+
+    *//**
      * Implement the AsyncResponse method
      * @param outputAdapter THe init adapter from the AsyncTask.
      * @param contacts
-     */
+     *//*
     @Override
     public void processFinish(SearchContactsAdapter outputAdapter, ContactList contacts) {
         //init the local adapter with the output adapter
         mSContactsAdapter = outputAdapter;
-    }
+    }*/
 }

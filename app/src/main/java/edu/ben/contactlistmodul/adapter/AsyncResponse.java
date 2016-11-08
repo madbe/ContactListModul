@@ -18,5 +18,6 @@ import edu.ben.contactlistmodul.contactAPI.objects.contacts.ContactList;
  */
 
 public interface AsyncResponse {
+    void processFinish(ContactList contacts);
     void processFinish(SearchContactsAdapter outputAdapter, ContactList contacts);
 }
